@@ -77,13 +77,18 @@ app.post('/listSharedData', (req,res)=>{
 })
 
 
-app.get('endRide/:ride_id', (req,res)=>{
+app.get('/endRide/:ride_id', (req,res)=>{
 
     ride_id=req.params.ride_id;
-    // end ride using socket and db
-    // func to deactivate ride 
+    q='update rides set is_ongoing=0 where ride_id='+ride_id+';';
 
-    res.send("Ride Ended");
+    db.query(q, (err,result)=>{
+        if(err)
+            return res.json(err);
+
+        console.log("endRide Working",result);
+        res.send("Ride Ended");
+    })
 })
 
 
@@ -92,8 +97,6 @@ app.get('endRide/:ride_id', (req,res)=>{
 
 app.get('/updateLocation/:ride_id', (req,res)=>{
     ride_id=req.params.ride_id;
-
-
 
     res.send("Location Updated");
 })
