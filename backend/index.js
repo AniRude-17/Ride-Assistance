@@ -8,13 +8,14 @@ const db = mysql.createConnection({
     database:"assist"
 })
 
+const endPoint="http://localhost:5000/";
 
 const express = require('express');  
 const app = express(); 
 const PORT = 5000; 
 
 app.use(express.json());
-  
+app.set('json spaces', 2)
 app.listen(PORT, (error) =>{ 
     if(!error) 
         console.log("SERVER ON") 
@@ -24,47 +25,42 @@ app.listen(PORT, (error) =>{
 ); 
 
 
-app.get('/shareRide/:ride_id', (req,res)=>{
-    ride_id=req.params.ride_id;
-    q='update rides set is_shared=1 where ride_id='+ride_id+';';
-    ride_id=req.params.ride_id;
-    db.query(q, (err,result)=>{
+app.post('/ride/share', (req,res)=>{
+    ride_id=req.body.ride_id;
+    const q = 'UPDATE rides SET is_shared = 1 WHERE ride_id = ?;';
+    db.query(q, [ride_id], (err,result)=>{
 
         if(err)
             return res.json(err);
 
         console.log("shareRide Working",result);
-        res.send("Ride Shared with link  on /getRideDetails/"+ride_id);
+        res.send("Link Generated your link is : "+endPoint+"ride/"+ride_id);
     })
-
 })
 
 
-app.get('/getRideDetails/:ride_id', (req,res)=>{
+
+app.get('/ride/:ride_id', (req,res)=>{
 
     ride_id=req.params.ride_id;
+    const q='SELECT * FROM rides WHERE ride_id = ?;';
 
-
-    q='select * from rides where ride_id='+ride_id+' and is_shared=1;';
-    db.query(q, (err,result)=>{
+    db.query(q, [ride_id], (err,result)=>{
 
         if(err)
             return res.json(err);
-
         console.log("getRideDetails Working",result);
-        res.send(result);
+        //var currentPosition=getCurrentLocation(); //start websocket
+        res.json(result);
     })
 })
 
 
-app.post('/listSharedData', (req,res)=>{
+app.post('/ride/admin', (req,res)=>{
 
-    
     is_admin=req.body.admin;
     if(is_admin!=1)
         return res.send("Not Admin");
-
-
 
     q='select * from rides where is_shared=1;';
     db.query(q, (err,result)=>{
@@ -77,12 +73,13 @@ app.post('/listSharedData', (req,res)=>{
 })
 
 
-app.get('/endRide/:ride_id', (req,res)=>{
+
+
+app.get('/ride/end/:ride_id', (req,res)=>{
 
     ride_id=req.params.ride_id;
-    q='update rides set is_ongoing=0 where ride_id='+ride_id+';';
-
-    db.query(q, (err,result)=>{
+    const q='UPDATE rides SET is_ongoing = 0 WHERE ride_id = ?;';
+    db.query(q, [ride_id],  (err,result)=>{
         if(err)
             return res.json(err);
 
