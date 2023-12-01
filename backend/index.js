@@ -80,7 +80,7 @@ app.post('/ride/admin', (req,res)=>{
     if(is_admin!=1)
         return res.send("Not Admin");
 
-    q='select * from ongoingrides where rides.is_shared=1 or ongoingrides.is_shared=1;';
+    q='select * from ongoingrides where is_shared=1;';
     db.query(q, (err,result)=>{
         if(err)
             return res.json(err);
