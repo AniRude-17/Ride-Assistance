@@ -61,7 +61,7 @@ app.post('/testing' , (req,res)=>{
 app.get('/ride/:ride_id', (req,res)=>{
 
     ride_id=req.params.ride_id;
-    const q='SELECT * FROM ongoingrides WHERE ride_id = ?;';
+    const q='SELECT * FROM ongoingrides WHERE ride_id = ? and is_shared=1;';
 
     db.query(q, [ride_id], (err,result)=>{
 
