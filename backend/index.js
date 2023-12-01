@@ -5,8 +5,10 @@ const db = mysql.createConnection({
     host:"localhost",
     user:"root",
     password:"password",
-    database:"assist"
+    database:"assist2"
 })
+
+
 const getCurrentTime = () => {
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0');
@@ -36,8 +38,10 @@ app.listen(PORT, (error) =>{
 
 
 app.post('/ride/share', (req,res)=>{
+    console.log(req);
+    // res.send(req);
     ride_id=req.body.ride_id;
-    const q = 'UPDATE rides SET is_shared = 1 WHERE ride_id = ?;';
+    const q = 'UPDATE ongoingrides SET is_shared = 1 WHERE ride_id = ?;';
     db.query(q, [ride_id], (err,result)=>{
 
         if(err)
@@ -49,11 +53,15 @@ app.post('/ride/share', (req,res)=>{
 })
 
 
+app.post('/testing' , (req,res)=>{
+    res.send(req.body);
+})
+
 
 app.get('/ride/:ride_id', (req,res)=>{
 
     ride_id=req.params.ride_id;
-    const q='SELECT * FROM rides WHERE ride_id = ?;';
+    const q='SELECT * FROM ongoingrides WHERE ride_id = ?;';
 
     db.query(q, [ride_id], (err,result)=>{
 
@@ -72,7 +80,7 @@ app.post('/ride/admin', (req,res)=>{
     if(is_admin!=1)
         return res.send("Not Admin");
 
-    q='select * from rides where is_shared=1;';
+    q='select * from ongoingrides where rides.is_shared=1 or ongoingrides.is_shared=1;';
     db.query(q, (err,result)=>{
         if(err)
             return res.json(err);
@@ -85,19 +93,35 @@ app.post('/ride/admin', (req,res)=>{
 
 
 
-app.get('/ride/end/:ride_id', (req,res)=>{
+app.get('/ride/end/:ride_id', (req, res) => {
+    const ride_id = req.params.ride_id;
 
-    ride_id=req.params.ride_id;
-    const q='UPDATE rides SET is_ongoing = 0, time_end = ? WHERE ride_id = ?;';
-    var currentTime=getCurrentTime();
-    db.query(q, [currentTime,ride_id],  (err,result)=>{
-        if(err)
+    const q = 'UPDATE ongoingrides SET end_time = ? WHERE ride_id = ?;';
+    const currentTime = getCurrentTime();
+
+    db.query(q, [currentTime, ride_id], (err, result) => {
+        if (err) {
             return res.json(err);
+        }
 
-        console.log("endRide Working",result);
-        res.send("Ride Ended");
-    })
-})
+        const q1 = 'INSERT INTO rides SELECT * FROM ongoingrides WHERE ride_id = ?;';
+        db.query(q1, [ride_id], (err1, result1) => {
+            if (err1) {
+                return res.json(err1);
+            }
+
+            const q2 = 'DELETE FROM ongoingrides WHERE ride_id = ?;';
+            db.query(q2, [ride_id], (err2, result2) => {
+                if (err2) {
+                    return res.json(err2);
+                }
+
+                console.log("endRide Working", result2);
+                res.send("Ride Ended");
+            });
+        });
+    });
+});
 
 
 app.get('/ride/user/:user_id', (req,res)=>{
@@ -115,16 +139,36 @@ app.get('/ride/user/:user_id', (req,res)=>{
 
 
 
+app.post('/feedback', (req,res)=>{
+    ride_id=req.body.ride_id;
+    feedback=req.body.feedback;
+    const q='insert into feedbacks(ride_id,feedback) values(?,?);';
 
-app.get('/updateLocation/:ride_id', (req,res)=>{
-    ride_id=req.params.ride_id;
+    db.query(q, [ride_id,feedback], (err,result)=>{
+        if(err)
+            return res.json(err);
 
-    res.send("Location Updated");
+        console.log("feedback Working",result);
+        res.send("Feedback Submitted");
+    })
+}  )
+
+
+app.post('/feedback/admin', (req,res)=>{
+
+    is_admin=req.body.admin;
+    if(is_admin!=1)
+        return res.send("Not Admin");
+
+    q='select * from feedbacks;';
+    db.query(q, (err,result)=>{
+        if(err)
+            return res.json(err);
+
+        console.log("listFeedback Working",result);
+        res.send(result);
+    })
 })
-
-
-
-
 
 
 

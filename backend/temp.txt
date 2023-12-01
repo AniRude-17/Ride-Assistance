@@ -66,3 +66,53 @@ CREATE TABLE `assist2`.`feedbacks` (
   `feedback` VARCHAR(45) NULL,
   PRIMARY KEY (`feedback_id`));
 
+_________________________________________________________________________-
+
+ENTER DATA INTO users
+
+INSERT INTO user (user_name) VALUES
+('John Doe'),
+('Alice Smith'),
+('Bob Johnson'),
+('Eva Miller'),
+('Charlie Brown'),
+('Sophie Williams'),
+('David Davis'),
+('Olivia Robinson'),
+('Michael White'),
+('Emily Turner');
+
+________________________________________________________
+
+INSERT INTO driver (driver_name) VALUES
+('James Johnson'),
+('Sophia Wilson'),
+('William Smith'),
+('Emma Davis'),
+('Daniel Miller'),
+('Olivia Brown'),
+('Liam Johnson'),
+('Ava Wilson'),
+('Ethan Turner'),
+('Isabella White');
+
+________________________________________________________
+
+
+MAKE DUMMY RIDES
+
+INSERT INTO assist2.ongoingRides (user_id, driver_id, source, dest, start_time, is_shared)
+VALUES
+(1, 1, 201, 301, '08:30:00', 0),
+(2, 2, 202, 302, '09:15:00', 0),
+(3, 3, 203, 303, '10:00:00', 0),
+(4, 4, 204, 304, '10:45:00', 0),
+(5, 5, 205, 305, '11:30:00', 0),
+(6, 6, 206, 306, '12:15:00', 0),
+(7, 7, 207, 307, '13:00:00', 0),
+(8, 8, 208, 308, '13:45:00', 0),
+(9, 9, 209, 309, '14:30:00', 0),
+(10, 10, 210, 310, '15:15:00', 0);
+
+_____________________________________________________________________________________
+
