@@ -24,3 +24,45 @@ VALUES
 
 insert into ongoing_rides(ride_id)
 values (1),(2),(3),(4),(5);
+
+
+
+
+
+
+
+
+
+
+____________________________________ASSIST 2_________________________________________________
+
+
+CREATE TABLE `assist2`.`rides` (
+  `ride_id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `driver_id` INT NOT NULL,
+  `source` INT NOT NULL,
+  `dest` INT NOT NULL,
+  `start_time` TIME NOT NULL,
+  `end_time` TIME NOT NULL,
+  `is_shared` TINYINT NOT NULL,
+  PRIMARY KEY (`ride_id`));
+
+CREATE TABLE `assist2`.`driver` (
+  `driver_id` INT NOT NULL,
+  `driver_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`driver_id`));
+
+
+CREATE TABLE `assist2`.`user` (
+  `user_id` INT NOT NULL,
+  `user_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`user_id`));
+
+
+CREATE TABLE `assist2`.`feedbacks` (
+  `feedback_id` INT NOT NULL,
+  `ride_id` INT NOT NULL,
+  `feedback` VARCHAR(45) NULL,
+  PRIMARY KEY (`feedback_id`));
+

@@ -7,6 +7,16 @@ const db = mysql.createConnection({
     password:"password",
     database:"assist"
 })
+const getCurrentTime = () => {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+  
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+
 
 const endPoint="http://localhost:5000/";
 
@@ -78,8 +88,9 @@ app.post('/ride/admin', (req,res)=>{
 app.get('/ride/end/:ride_id', (req,res)=>{
 
     ride_id=req.params.ride_id;
-    const q='UPDATE rides SET is_ongoing = 0 WHERE ride_id = ?;';
-    db.query(q, [ride_id],  (err,result)=>{
+    const q='UPDATE rides SET is_ongoing = 0, time_end = ? WHERE ride_id = ?;';
+    var currentTime=getCurrentTime();
+    db.query(q, [currentTime,ride_id],  (err,result)=>{
         if(err)
             return res.json(err);
 
@@ -88,6 +99,19 @@ app.get('/ride/end/:ride_id', (req,res)=>{
     })
 })
 
+
+app.get('/ride/user/:user_id', (req,res)=>{
+
+    user_id=req.params.user_id;
+    const q='SELECT * FROM rides WHERE user_id = ?;';
+    db.query(q, [user_id], (err,result)=>{
+        if(err)
+            return res.json(err);
+
+        console.log("list user rides Working",result);
+        res.send(result);
+    })
+})
 
 
 
