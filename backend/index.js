@@ -24,12 +24,18 @@ app.listen(PORT, (error) =>{
 ); 
 
 
-app.get('/shareRide', (req,res)=>{
+app.get('/shareRide/:ride_id', (req,res)=>{
+    ride_id=req.params.ride_id;
+    q='update rides set is_shared=1 where ride_id='+ride_id+';';
+    ride_id=req.params.ride_id;
+    db.query(q, (err,result)=>{
 
-    ride_id=req.query.ride_id;
-    // generate shareble link
-    link="temp";
-    res.send({"Link":link});
+        if(err)
+            return res.json(err);
+
+        console.log("shareRide Working",result);
+        res.send("Ride Shared with link  on /getRideDetails/"+ride_id);
+    })
 
 })
 
@@ -37,36 +43,37 @@ app.get('/shareRide', (req,res)=>{
 app.get('/getRideDetails/:ride_id', (req,res)=>{
 
     ride_id=req.params.ride_id;
-    // get ride details from traveller using socket adn db
-    var onGoing=true;
-    driver_id=1;
-    source=1;
-    destination=432;
-    currLoc=123;
 
-    details = {"ride_id":ride_id,"driver_id":driver_id,"source":source,"destination":destination,"Current Location":currLoc};
-    
-    if (onGoing==false)
-        res.send("Link Expired")
-    res.send(details);
 
+    q='select * from rides where ride_id='+ride_id+' and is_shared=1;';
+    db.query(q, (err,result)=>{
+
+        if(err)
+            return res.json(err);
+
+        console.log("getRideDetails Working",result);
+        res.send(result);
+    })
 })
 
 
 app.post('/listSharedData', (req,res)=>{
-    if(req.body.admin===1) {
-        //fetch all shared data from db
-        data={"1":"temp1","2":"temp2","3":"temp3"};
-        res.send(data);
-    }
-    else{
-        //fetch shared data of user_id from db
-        user_id=req.body.user_id;
-        data={"1":"temp1","2":"temp2","3":"temp3vfsdgvgggg","user_id":user_id};
-        res.send(data);
-    }
+
+    
+    is_admin=req.body.admin;
+    if(is_admin!=1)
+        return res.send("Not Admin");
 
 
+
+    q='select * from rides where is_shared=1;';
+    db.query(q, (err,result)=>{
+        if(err)
+            return res.json(err);
+
+        console.log("listSharedData Working",result);
+        res.send(result);
+    })
 })
 
 
@@ -80,6 +87,16 @@ app.get('endRide/:ride_id', (req,res)=>{
 })
 
 
+
+
+
+app.get('/updateLocation/:ride_id', (req,res)=>{
+    ride_id=req.params.ride_id;
+
+
+
+    res.send("Location Updated");
+})
 
 
 
